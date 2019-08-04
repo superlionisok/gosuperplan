@@ -1,6 +1,6 @@
 package main
 
-import(
+import (
 	"dbmodels"
 	"encoding/json"
 	"fmt"
@@ -11,29 +11,20 @@ import(
 	"strings"
 )
 
-
 func main() {
 	fmt.Println("start")
 
-
-
 	collectOne()
-
-
 
 	fmt.Println("end")
 }
-func collectOne()  dbmodels.LotOpenResult{
+func collectOne() dbmodels.LotOpenResult {
 
 	url := "https://www.600wcp.com/ssc/ajaxGetHistory.json?timestamp=1564745106126" //请求地址
 
+	var res dbmodels.LotOpenResult
 
-
-
-
-var res dbmodels.LotOpenResult
-
-return  res
+	return res
 }
 func httpDo() {
 	client := &http.Client{}
@@ -53,12 +44,11 @@ func httpDo() {
 	body, err := ioutil.ReadAll(resp.Body)
 	if err != nil {
 		// handle error
-		fmt.Println("页面打开错误：",err.Error())
+		fmt.Println("页面打开错误：", err.Error())
 	}
 
 	fmt.Println(string(body))
 }
-
 
 func DoPost() {
 
@@ -77,7 +67,7 @@ func DoPost() {
 		fmt.Println(err)
 	}
 
-	fmt.Println("页面内容",string(body))
+	fmt.Println("页面内容", string(body))
 
 	var f interface{}
 	err = json.Unmarshal(body, &f)
@@ -110,7 +100,6 @@ func DoPost() {
 	var opentime = d["openTime"]
 
 	var a = opentime.(float64)
-
 	fmt.Println(a)
 
 	var aaa = int64(a)
