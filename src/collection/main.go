@@ -97,7 +97,6 @@ func DoPost() {
 	var number = d["number"]
 	var opencode = d["openCode"]
 	var opentime = d["openTime"]
-
 	var a = opentime.(float64)
 	fmt.Println(a)
 
