@@ -1,4 +1,5 @@
 package dbmodels
+
 import (
 	"flag"
 	"fmt"
@@ -8,11 +9,13 @@ import (
 	"log"
 	"time"
 )
+
 var DB *xorm.Engine
 var (
 	configFile = flag.String("configfile", "./conf/conf.ini", "General configuration file")
 )
 var TOPIC = make(map[string]string)
+
 func init() {
 	/*
 	   name = lionjihua
@@ -23,14 +26,13 @@ func init() {
 	*/
 	GetConfig()
 	var err error
-	var name=TOPIC["name"]
-	var host=TOPIC["host"]
-	var port=TOPIC["port"]
-	var user=TOPIC["user"]
-	var pwd=TOPIC["pwd"]
+	var name = TOPIC["name"]
+	var host = TOPIC["host"]
+	var port = TOPIC["port"]
+	var user = TOPIC["user"]
+	var pwd = TOPIC["pwd"]
 
-
-	var sqlconn=user+":"+pwd+"@tcp("+host+":"+port+")/"+name+"?charset=utf8"
+	var sqlconn = user + ":" + pwd + "@tcp(" + host + ":" + port + ")/" + name + "?charset=utf8"
 
 	DB, err = xorm.NewEngine("mysql", sqlconn)
 	if err != nil {
@@ -39,7 +41,8 @@ func init() {
 	}
 	DB.ShowSQL(true)
 	//	engine.ShowWarn=true
-	err2 := DB.Sync2(new(LotLottery))
+	//需要生成的数据库此处需要加进
+	err2 := DB.Sync2(new(LotLottery), new(LotOpenResult))
 	if err2 != nil {
 		fmt.Println("mysql sync2 err. err=", err2.Error())
 		return
@@ -47,7 +50,7 @@ func init() {
 
 }
 
-func GetConfig(){
+func GetConfig() {
 
 	cfg, err := config.ReadDefault(*configFile)
 	if err != nil {
@@ -74,16 +77,40 @@ func GetConfig(){
 
 }
 
+//彩种表
 type LotLottery struct {
-	ID  int `xorm:"pk autoincr 'ID'"`
-	Title string `xorm:"'Name'"`
-	Sort int `xorm:"'Sort'"`
-}
-type LotOpenResult struct {
-	ID  int `xorm:"pk autoincr 'ID'"`
-	LotteryID int `xorm:"'LotteryID'"`
-	OpenTime time.Time `xorm:"'OpenTime'"`
+	//id
+	ID int `xorm:"pk autoincr 'ID'"`
+
+	Title      string    `xorm:"'Name'"`
 	CreateTime time.Time `xorm:"'CreateTime'"`
-	TermNumber string `xorm:"'TermNumber'"`
-	OpenNumber string `xorm:"'OpenNumber'"`
+	Contents   string    `xorm:"'Contents'"`
+	IsDel      int       `xorm:"'IsDel'"`
+	AbName     string    `xorm:"'AbName'"`
+	//每天开奖次数
+	DayOpenCount int `xorm:"'DayOpenCount'"`
+	//每天开奖时间
+	DayStartTime time.Time `xorm:"'DayStartTime'"`
+	//每天结束时间
+	DayEndTime time.Time `xorm:"'DayEndTime'"`
+	//开奖频率（几分钟一次） 单位 秒
+	Rate int `xorm:"'Rate'"`
+	//开奖结果延迟时间 单位秒
+	Delay         int    `xorm:"'Delay'"`
+	OpenResultUrl string `xorm:"'OpenResultUrl'"`
+	LotteryTypeID int    `xorm:"'LotteryTypeID'"`
+	//期号类型（1每天重复（日期加数字+1），2 无限累加）
+	TermNoType int `xorm:"'TimeType'"`
+	//每天第一次开奖延迟时间段。和0点做计算 单位 秒
+	StartTimeSpan int `xorm:"'StartTimeSpan'"`
+}
+
+//开奖结果
+type LotOpenResult struct {
+	ID         int       `xorm:"pk autoincr 'ID'"`
+	LotteryID  int       `xorm:"'LotteryID'"`
+	OpenTime   time.Time `xorm:"'OpenTime'"`
+	CreateTime time.Time `xorm:"'CreateTime'"`
+	TermNumber string    `xorm:"'TermNumber'"`
+	OpenNumber string    `xorm:"'OpenNumber'"`
 }
