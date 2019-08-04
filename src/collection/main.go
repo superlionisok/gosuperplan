@@ -88,7 +88,6 @@ func DoPost() {
 	//    ]
 	//}
 	m := f.(map[string]interface{})
-
 	var r1 = m["result"]
 	fmt.Println(r1)
 	var r2 = m["sscHistoryList"]
