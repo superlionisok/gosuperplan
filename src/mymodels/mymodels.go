@@ -1,4 +1,5 @@
 package mymodels
+
 import (
 	"flag"
 	"fmt"
@@ -8,11 +9,13 @@ import (
 	"log"
 	"time"
 )
+
 var DB *xorm.Engine
 var (
 	configFile = flag.String("configfile", "./conf/conf.ini", "General configuration file")
 )
 var TOPIC = make(map[string]string)
+
 func init() {
 	/*
 	   name = lionjihua
@@ -23,14 +26,13 @@ func init() {
 	*/
 	GetConfig()
 	var err error
-	var name=TOPIC["name"]
-	var host=TOPIC["host"]
-	var port=TOPIC["port"]
-	var user=TOPIC["user"]
-	var pwd=TOPIC["pwd"]
+	var name = TOPIC["name"]
+	var host = TOPIC["host"]
+	var port = TOPIC["port"]
+	var user = TOPIC["user"]
+	var pwd = TOPIC["pwd"]
 
-
-	var sqlconn=user+":"+pwd+"@tcp("+host+":"+port+")/"+name+"?charset=utf8"
+	var sqlconn = user + ":" + pwd + "@tcp(" + host + ":" + port + ")/" + name + "?charset=utf8"
 
 	DB, err = xorm.NewEngine("mysql", sqlconn)
 	if err != nil {
@@ -47,7 +49,7 @@ func init() {
 
 }
 
-func GetConfig(){
+func GetConfig() {
 
 	cfg, err := config.ReadDefault(*configFile)
 	if err != nil {
@@ -75,15 +77,15 @@ func GetConfig(){
 }
 
 type LotLottery struct {
-	ID  int `xorm:"pk autoincr 'ID'"`
+	ID    int    `xorm:"pk autoincr 'ID'"`
 	Title string `xorm:"'Name'"`
-	Sort int `xorm:"'Sort'"`
+	Sort  int    `xorm:"'Sort'"`
 }
 type LotOpenResult struct {
-	ID  int `xorm:"pk autoincr 'ID'"`
-	LotteryID int `xorm:"'LotteryID'"`
-	OpenTime time.Time `xorm:"'OpenTime'"`
+	ID         int       `xorm:"pk autoincr 'ID'"`
+	LotteryID  int       `xorm:"'LotteryID'"`
+	OpenTime   time.Time `xorm:"'OpenTime'"`
 	CreateTime time.Time `xorm:"'CreateTime'"`
-	TermNumber string `xorm:"'TermNumber'"`
-	OpenNumber string `xorm:"'OpenNumber'"`
+	TermNumber string    `xorm:"'TermNumber'"`
+	OpenNumber string    `xorm:"'OpenNumber'"`
 }

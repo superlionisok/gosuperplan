@@ -5,7 +5,10 @@
     <mapping directory="$PROJECT_DIR$/src/cloud.google.com/go" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/PuerkitoBio/goquery" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/andybalholm/cascadia" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/github.com/bsm/sarama-cluster" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/github.com/coreos/etcd" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/denisenkom/go-mssqldb" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/github.com/go-redis/redis" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/go-sql-driver/mysql" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/go-xorm/xorm" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/jackc/pgx" vcs="Git" />
@@ -15,7 +18,9 @@
     <mapping directory="$PROJECT_DIR$/src/github.com/pkg/errors" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/stretchr/testify" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/ziutek/mymysql" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/go.etcd.io/etcd" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/golang.org/x/text" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/gopkg.in/ini.v1" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/gopkg.in/yaml.v2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/xorm.io/builder" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/xorm.io/core" vcs="Git" />

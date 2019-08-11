@@ -1,12 +1,15 @@
 package dbmodels
 
 import (
+	"container/list"
+	"database/sql"
 	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/go-xorm/xorm"
 	"github.com/larspensjo/config"
 	"log"
+	"strconv"
 	"time"
 )
 
@@ -16,36 +19,96 @@ var (
 )
 var TOPIC = make(map[string]string)
 
-func init() {
-	/*
-	   name = lionjihua
-	   host = 10.10.15.202
-	   port = 3306
-	   user = root
-	   pwd
-	*/
-	GetConfig()
-	var err error
-	var name = TOPIC["name"]
-	var host = TOPIC["host"]
-	var port = TOPIC["port"]
-	var user = TOPIC["user"]
-	var pwd = TOPIC["pwd"]
-
-	var sqlconn = user + ":" + pwd + "@tcp(" + host + ":" + port + ")/" + name + "?charset=utf8"
-
-	DB, err = xorm.NewEngine("mysql", sqlconn)
+func getDB() (*sql.DB, error) {
+	db, err := sql.Open("mysql", "root:123456@tcp(10.10.15.125:8066)/TESTDB?charset-utf-8&parseTime=true")
 	if err != nil {
-		fmt.Println("mysql connect err. err=", err.Error())
-		return
+		log.Println(err)
+		return nil, err
 	}
-	DB.ShowSQL(true)
-	//	engine.ShowWarn=true
-	//需要生成的数据库此处需要加进
-	err2 := DB.Sync2(new(LotLottery), new(LotOpenResult))
-	if err2 != nil {
-		fmt.Println("mysql sync2 err. err=", err2.Error())
-		return
+	db.SetMaxOpenConns(30) //设置最大打开的连接数
+	db.SetMaxIdleConns(1)  // 设置最大闲置连接数
+	db.Ping()
+	return db, nil
+}
+
+func Query() {
+	customers := list.New()
+	db, err := getDB()
+	rows, err := db.Query("select * from manager")
+	if err != nil {
+		log.Println("error-44 : ", err)
+	}
+	for rows.Next() {
+		var ID int
+		var Mname string
+		var CreateTime time.Time
+
+		if err := rows.Scan(&ID, &Mname, &CreateTime); err != nil {
+			log.Println("error-52 : ", err)
+		}
+		c := Manager{ID, Mname, CreateTime}
+		customers.PushBack(c)
+	}
+	defer rows.Close()
+	defer db.Close()
+	for cs := customers.Front(); cs != nil; cs = cs.Next() {
+		cu := cs.Value.(Manager)
+		fmt.Println("custromer : ", cu.ID, cu.Mname, cu.CreateTime)
+
+	}
+}
+func MyCatInsert() {
+	var t0 = time.Now()
+	var managers = []Manager{}
+
+	var qidongid = 5850200
+	var instertCount = 10000
+
+	for k := 1; k < 101; k++ {
+		fmt.Println("第", k, "次插入。qidongid=", qidongid)
+		managers = []Manager{}
+		for i := 0; i < instertCount; i++ {
+
+			var add = Manager{}
+			add.ID = qidongid
+			add.Mname = "name"
+			add.CreateTime = time.Now()
+			managers = append(managers, add)
+			qidongid = qidongid + 1
+		}
+		//insert into manager ( ID,Mname, CreateTime) values(11,'name','2019-08-06' ),(12,'name','2019-08-06' )
+		var strSql = "insert into manager (ID,Mname, CreateTime) values"
+		var strValue = ""
+		var strdate = "2019-01-01"
+		for _, v := range managers {
+			var str = "(" + strconv.Itoa(v.ID) + ",'" + v.Mname + "','" + strdate + "'),"
+			strValue = strValue + str
+
+		}
+		var lencount = len(strValue)
+		strValue = strValue[0 : lencount-1]
+
+		strSql = strSql + strValue
+
+		var t1 = time.Now()
+		db, err := getDB()
+		if err != nil {
+			fmt.Println("数据库链接错误")
+			return
+		}
+		defer db.Close()
+		stm, err := db.Exec(strSql)
+		if err != nil {
+			log.Println(err)
+			return
+		}
+
+		var t2 = time.Now()
+		var timespan = t2.Sub(t1).Seconds()
+		fmt.Println("插入成功,共计"+strconv.Itoa(instertCount)+"条。耗时", timespan, "秒")
+		var timespan2 = t2.Sub(t0).Seconds()
+		fmt.Println("插入成功,总计耗时", timespan2, "秒")
+		fmt.Println(stm)
 	}
 
 }
@@ -72,8 +135,8 @@ func GetConfig() {
 	}
 	//Initialized topic from the configuration END
 
-	fmt.Println(TOPIC)
-	fmt.Println(TOPIC["debug"])
+	//fmt.Println(TOPIC)
+	//fmt.Println(TOPIC["debug"])
 
 }
 
@@ -113,4 +176,10 @@ type LotOpenResult struct {
 	CreateTime time.Time `xorm:"'CreateTime'"`
 	TermNumber string    `xorm:"'TermNumber'"`
 	OpenNumber string    `xorm:"'OpenNumber'"`
+}
+
+type Manager struct {
+	ID         int
+	Mname      string
+	CreateTime time.Time
 }
