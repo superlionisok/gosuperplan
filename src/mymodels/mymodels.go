@@ -40,6 +40,8 @@ func init() {
 		return
 	}
 	DB.ShowSQL(true)
+	DB.SetMaxOpenConns(30)
+	DB.SetConnMaxLifetime(1)
 	//	engine.ShowWarn=true
 	err2 := DB.Sync2(new(LotLottery))
 	if err2 != nil {

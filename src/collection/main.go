@@ -9,14 +9,19 @@ import (
 	"github.com/Shopify/sarama"
 	cluster "github.com/bsm/sarama-cluster"
 	"github.com/go-redis/redis"
+	tsgutils "github.com/typa01/go-utils"
 	"go.etcd.io/etcd/clientv3"
+	"gopkg.in/mgo.v2"
+	"gopkg.in/mgo.v2/bson"
 	"helper"
 	"io/ioutil"
 	"log"
+	"models"
 	"os"
 	"os/signal"
 	"strconv"
 	"sync"
+
 	"time"
 
 	"net/http"
@@ -44,12 +49,20 @@ var chanReadyCount chan int
 func main() {
 	fmt.Println("start")
 	defer catchPanic("主线程异常")
+	testxormwhere()
+	//TestMongoDB()
+	//getAllLottery()
+	//testMongodbInsert()
+	//MongofindByName()
+	//MongoUpdateByName()
+	//test_xorm_get()
+	//TestInterFace()
 	//	TestWaitGroup()
 	//SendToKafka()
 	//ShenChanKafkaYiBu()
 	//SaramaProducer()
 	//XiaoFeiKafka()
-	DoRedis()
+	//DoRedis()
 	//ShenChanKafka()
 	//doetcd()
 	//var n = helper.ConfigGet("mysql", "name")
@@ -62,14 +75,239 @@ func main() {
 	//dbmodels.MyCatInsert()
 	//MapLotteryTermNo = make(map[string]string)
 	//timer1 := time.NewTicker(10 * time.Second)
-	////Ticker触发
+	//Ticker触发
 	//for {
 	//	select {
 	//	case <-timer1.C:
 	//		doCollect()
 	//	}
 	//}
-	//fmt.Println("end")
+	fmt.Println("end")
+}
+
+func testxormwhere() {
+	fmt.Println(" 开始查询")
+	users := make([]models.LotOpenResult, 10)
+	err := dbmodels.DB.Where("OpenNumber  = ?", "'1,1,4' ").Find(&users)
+	if err != nil {
+		fmt.Println(" 查询错误，", err)
+		return
+	}
+	fmt.Println(users)
+}
+
+func TestMongoDB() {
+	url := "mongodb://localhost"
+	session, err := mgo.Dial(url)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	//打开默认数据库test
+
+	session.SetMode(mgo.Monotonic, true)
+	c := session.DB("test").C("student")
+	//插入student
+	var m dbmodels.Manager2
+	m.Guid = tsgutils.UUID()
+	m.Age = 31
+	m.Mname = "lb"
+	m.CreateTime = time.Now()
+	m.GroupName = "shu"
+	err = c.Insert(&m)
+	if err != nil {
+		fmt.Println("插入失败", err)
+		return
+	}
+
+	fmt.Println("插入成功")
+	//查找,查找条件"name"小写
+
+	stu := dbmodels.Manager2{}
+
+	err = c.Find(bson.M{"mname": "zf"}).One(&stu)
+	if err != nil {
+		fmt.Println("查找失败", err)
+		return
+	}
+	fmt.Println("查找成功", stu)
+	ms := make([]dbmodels.Manager2, 10)
+
+	err = c.Find(bson.M{"age": 31}).All(&ms)
+	if err != nil {
+		fmt.Println("查找失败", err)
+		return
+	}
+	fmt.Println("查找成功", ms)
+
+	var mc dbmodels.Manager2
+	mc.Age = 29
+	mc.Mname = "zf"
+	mc.CreateTime = time.Now()
+
+	err = c.Update(bson.M{"mname": ""}, mc)
+	if err != nil {
+		fmt.Println("修改失败", err)
+		return
+	}
+
+	fmt.Println("修改成功", mc.Mname, mc.CreateTime)
+
+	err = c.Remove(bson.M{"age": 10})
+
+	if err != nil {
+		fmt.Println("删除失败", err)
+		return
+	}
+	err = c.Remove(bson.M{"age": 30})
+	if err != nil {
+		fmt.Println("批量删除失败", err)
+		return
+	}
+
+	fmt.Println("删除成功")
+
+}
+
+func MongofindByName() {
+
+	var col = Collection{"testDB", "contacts"}
+	var m dbmodels.Manager2
+	m.Age = 1
+	m.Mname = "liubei"
+	m.CreateTime = time.Now()
+	session, err := mgo.Dial(URL)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	collection := session.DB(col.DB).C(col.Name)
+	result := dbmodels.Manager2{}
+	err = collection.Find(bson.M{"name": "z"}).One(&result)
+
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			fmt.Println("查找z 没有数据")
+		} else {
+			fmt.Println("查找z 失败.err=", err)
+		}
+
+	} else {
+		fmt.Println("查找z=", result)
+	}
+
+	err = collection.Find(bson.M{"mname": "liubei"}).One(&result)
+	if err != nil {
+		log.Fatal("查找失败", err)
+	}
+	fmt.Println("查找liubei=", result)
+
+}
+
+func MongoUpdateByName() {
+
+	var col = Collection{"testDB", "contacts"}
+	var m dbmodels.Manager2
+	m.Age = 1
+	m.Mname = "liubei"
+	m.CreateTime = time.Now()
+	session, err := mgo.Dial(URL)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+
+	session.SetMode(mgo.Monotonic, true)
+	collection := session.DB(col.DB).C(col.Name)
+	result := dbmodels.Manager2{}
+	err = collection.Find(bson.M{"mname": "zhangfei"}).One(&result)
+
+	if err != nil {
+		if err == mgo.ErrNotFound {
+			fmt.Println("查找z 没有数据")
+		} else {
+			fmt.Println("查找z 失败.err=", err)
+		}
+
+	} else {
+		fmt.Println("查找z=", result)
+	}
+
+	err = collection.Find(bson.M{"mname": "liubei"}).One(&result)
+	if err != nil {
+		log.Fatal("查找失败", err)
+	}
+	fmt.Println("查找liubei=", result)
+	err = collection.Update(bson.M{"mname": "liubei"}, bson.M{"$set": bson.M{"mname": "liubeibei"}})
+	if err != nil {
+		log.Fatal("修改失败", err)
+	} else {
+		fmt.Println("修改成功")
+	}
+}
+
+type Collection struct {
+	DB   string
+	Name string
+}
+
+const (
+	URL = "127.0.0.1:27017"
+)
+
+func testMongodbInsert() {
+	var col = Collection{"testDB", "m2"}
+	var m dbmodels.Manager2
+	m.Age = 1
+	m.Mname = "liubei"
+	m.CreateTime = time.Now()
+	session, err := mgo.Dial(URL)
+	if err != nil {
+		panic(err)
+	}
+	defer session.Close()
+	c := session.DB(col.DB).C(col.Name)
+	err = c.Insert(m)
+	if err != nil {
+		log.Fatal(err)
+	}
+	fmt.Println(" mongodb Insert ready")
+
+}
+
+func test_xorm_get() {
+	var m dbmodels.Manager
+	m.ID = 100
+	has, err := dbmodels.DB.Get(m)
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(has)
+
+}
+
+func TestInterFace() {
+
+	var manager = dbmodels.Manager{}
+	manager.ID = 3
+	manager.CreateTime = time.Now()
+	manager.Mname = "zhangsan1"
+
+	var jsonstr, _ = json.Marshal(manager)
+	fmt.Println(string(jsonstr))
+	//fmt.Println("type: ", reflect.TypeOf(manager))
+	//fmt.Println("value: ", reflect.ValueOf(manager))
+
+	//	dbmodels.Add(manager)
+	//dbmodels.Update(manager)
+	//	dbmodels.Del(manager)
+
+	dbmodels.Find(manager)
+
+	fmt.Println("前台查到的m=", manager)
+
 }
 
 func TestWaitGroup() {
@@ -267,7 +505,8 @@ func ShenChanKafkaYiBu() {
 	fmt.Println("fa song wan cheng")
 }
 func XiaoFeiKafka() {
-	topic := []string{"test"}
+	topic := []string{"lotopenresult5" +
+		""}
 	var wg = &sync.WaitGroup{}
 	wg.Add(2)
 	//广播式消费：消费者1
@@ -613,7 +852,7 @@ func collectOne(lotteryModel dbmodels.LotLottery) {
 func collectOneByAPI(lotteryModel dbmodels.LotLottery) {
 
 	defer catchPanic("采集" + lotteryModel.AbName + "过程异常")
-	//url := "http://10.10.15.66:19001/api/OpenResult?uid=1&lotteryid=" + lotteryModel.Title //请求地址
+	//url := "http://10.10.15.202:19001/api/OpenResult?uid=1&lotteryid=" + lotteryModel.Title //请求地址
 	url := helper.ConfigGet("url", "apiaddress")
 
 	url = url + strconv.Itoa(lotteryModel.ID)
@@ -654,7 +893,7 @@ func collectOneByAPI(lotteryModel dbmodels.LotLottery) {
 
 func getAllLottery() []dbmodels.LotLottery {
 	var list []dbmodels.LotLottery
-	err := dbmodels.DB.Where("IsDel=?", 0).Find(&list)
+	err := dbmodels.DB.Where("IsDel=? ", " 0  or 1=1 ").Find(&list)
 	if err != nil {
 		//panic("数据库链接错误")
 		fmt.Println("数据库链接错误", time.Now().Format("2006-01-02 15:04:05"))
@@ -710,6 +949,6 @@ func InsertMoreTest() {
 
 func UserMycatQuery() {
 
-	dbmodels.Query()
+	//dbmodels.Query()
 
 }

@@ -12,15 +12,18 @@
     <mapping directory="$PROJECT_DIR$/src/github.com/go-sql-driver/mysql" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/go-xorm/xorm" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/jackc/pgx" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/github.com/jmoiron/sqlx" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/larspensjo/config" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/lib/pq" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/mattn/go-sqlite3" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/pkg/errors" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/stretchr/testify" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/github.com/typa01/go-utils" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/github.com/ziutek/mymysql" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/go.etcd.io/etcd" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/golang.org/x/text" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/gopkg.in/ini.v1" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/gopkg.in/mgo.v2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/gopkg.in/yaml.v2" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/xorm.io/builder" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/xorm.io/core" vcs="Git" />
